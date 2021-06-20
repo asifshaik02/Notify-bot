@@ -77,7 +77,7 @@ if os.fork():
         await ctx.send(embed=embed)
 
 else:
-    #runs the "announce" function once a week
+    #runs the "announce" function once a day
     @tasks.loop(seconds=86400)
     async def announce():
         channel = bot.get_channel(channel_id)
