@@ -6,13 +6,38 @@ from time import sleep
 from discord.ext import commands,tasks
 
 
+# Add anilist user name and discord client secret
+username = None
+secret = None
+
+# format time
+intervals = (
+    ('days', 86400),    # 60 * 60 * 24
+    ('hours', 3600),    # 60 * 60
+    ('minutes', 60),
+    ('seconds', 1),
+)
+
+def display_time(seconds, granularity=3):
+    result = []
+
+    for name, count in intervals:
+        value = seconds // count
+        if value:
+            seconds -= value * count
+            if value == 1:
+                name = name.rstrip('s')
+            result.append("{} {}".format(value, name))
+    return ', '.join(result[:granularity])
+
+user = Anilist.Anilist(username)
+
 bot = commands.Bot(command_prefix='.')
-user = Anilist.Anilist('<Anilist username>')
 
-channel_id = 827178386132172840 #channel id to send msg in
+channel_id = None # channel id to send msg in
 
-#creates two process one for comands and another for tasks
 
+# creates two process one for comands and another for tasks
 if os.fork():
     @bot.event
     async def on_ready():
@@ -31,18 +56,29 @@ if os.fork():
     async def clear(ctx,n=5):
         n = n + 1
         await ctx.channel.purge(limit=n)
+    
+    @bot.command(brief="change user.requires new username as an argument")
+    async def register(ctx,uname):
+        username = uname
 
-    @bot.command(brief="List the anime to be Aired this week")
+    @bot.command(brief="List airing schedules for anime in your watch list")
     async def list(ctx):
         l = user.getWatchingList()
+        embed = discord.Embed(
+            title="Airing Schedule",
+            description="Your watchlist airing schedule"
+        )
         for i in l:
-            embed = discord.Embed(title=i['title'],url=i['url'],description=f"Episode: {i['epiNo']} (yet to be aired)")
-            embed.set_image(url=i['img'])
-            await ctx.send(embed=embed)
+          embed.add_field(
+              name=i['title'],
+              value=f"Episode: [{i['epiNo']}]({i['url']}) \nTime: {display_time(i['timeRem'])}",
+              inline=False)
+
+        await ctx.send(embed=embed)
 
 else:
     #runs the "announce" function once a week
-    @tasks.loop(seconds=604800)
+    @tasks.loop(seconds=86400)
     async def announce():
         channel = bot.get_channel(channel_id)
         list = user.getWatchingList()
@@ -72,4 +108,4 @@ else:
 keep_alive.keep_alive()
 
 #run Bot
-bot.run("<client_secret>")
+bot.run(secret)

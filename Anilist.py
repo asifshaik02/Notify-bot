@@ -35,7 +35,6 @@ class Anilist():
         return x['data']['User']['id']
     
 
-
     def print(self):
         l = self.getWatchingList()
         for i in l:
@@ -47,9 +46,10 @@ class Anilist():
         for i in range(n):
             for j in range(0, n-i-1):
                 if l[j]['timeRem'] < l[j+1]['timeRem']:
-                    l[j]['timeRem'], l[j+1]['timeRem'] = l[j+1]['timeRem'], l[j]['timeRem']
+                    l[j], l[j+1] = l[j+1], l[j]
         return l
     
+
     # returns user's currently watching anime details 
     # which are airing as a list of dictinaries
     def getWatchingList(self):
