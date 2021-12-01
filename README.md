@@ -7,7 +7,7 @@ we use anilist's graphql api to obtain data and discord's bot to send notificati
 ```console
 $ git clone https://github.com/asifshaik02/Notify-bot.git 
 $ cd Notify-bot 
-$ pip install requirements.txt
+$ pip install -r requirements.txt
 ```
 * open [notifyBot.py](/notifyBot.py) add your <b>anilist username</b> and <b>discord bot client_secret</b> and <b>channel id </b>
 * To get  discord's client_secret goto [Discord's developer dashboard](https://discord.com/developers/applications) 

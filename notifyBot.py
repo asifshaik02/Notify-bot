@@ -4,11 +4,13 @@ import Anilist
 import keep_alive
 from time import sleep
 from discord.ext import commands,tasks
+from nyaa import Torrent
+from dotenv import load_dotenv
 
-
+load_dotenv()
 # Add anilist user name and discord client secret
-username = None
-secret = None
+username = os.getenv('username')
+secret = os.getenv('client_secret')
 
 # format time
 intervals = (
@@ -74,6 +76,23 @@ if os.fork():
               value=f"Episode: [{i['epiNo']}]({i['url']}) \nTime: {display_time(i['timeRem'])}",
               inline=False)
 
+        await ctx.send(embed=embed)
+
+    @bot.command(brief="lists torrent for anime")
+    async def torrent(ctx,query,pr='sp'):
+        obj = Torrent()
+        epi_list = obj.search(query,provider=pr)
+        embed = discord.Embed(
+            title = query,
+            description = "Epi\n480p\t720p\t1080p"
+        )
+
+        for ep in epi_list:
+            embed.add_field(
+                name = ep,
+                value=f"[{epi_list[ep]['480p']['size']}]({epi_list[ep]['480p']['link']})\t\t[{epi_list[ep]['720p']['size']}]({epi_list[ep]['720p']['link']})\t\t[{epi_list[ep]['1080p']['size']}]({epi_list[ep]['1080p']['link']})",
+                inline=False
+            )
         await ctx.send(embed=embed)
 
 else:
